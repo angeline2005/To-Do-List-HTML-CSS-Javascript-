@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <title>To-Do List</title>
+        <link rel="stylesheet" type="text/css" href="index.css">
+    </head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="task-input" placeholder="Enter task" />
+    <button onclick="addTask()">Add Task</button>
+    <ul id="task-list"></ul>
+
+    <script>
+        let tasks = [];
+    
+        
+        window.onload = function () {
+            const savedTasks = localStorage.getItem("tasks");
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                renderTasks();
+            }
+        };
+    
+        
+        function saveTasks() {
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+    
+        
+        function addTask() {
+            const taskInput = document.getElementById("task-input");
+            const taskValue = taskInput.value.trim();
+    
+            if (taskValue === "") {
+                alert("Please enter a task!");
+                return;
+            }
+    
+            const newTask = {
+                taskName: taskValue,
+                completed: false,
+            };
+    
+            tasks.push(newTask);
+            taskInput.value = "";
+    
+            saveTasks(); 
+            renderTasks();
+        }
+    
+        
+        function toggleCompletion(index) {
+            tasks[index].completed = !tasks[index].completed;
+    
+            saveTasks(); 
+            renderTasks();
+        }
+    
+        
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+    
+            saveTasks(); 
+            renderTasks();
+        }
+    
+        
+        function renderTasks() {
+            const taskList = document.getElementById("task-list");
+            taskList.innerHTML = "";
+    
+            tasks.forEach((task, index) => {
+                const li = document.createElement("li");
+    
+                const taskText = document.createElement("span");
+                taskText.textContent = `${index + 1}. ${task.taskName}`;
+                if (task.completed) {
+                    taskText.classList.add("completed");
+                }
+    
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = task.completed;
+                checkbox.onclick = function () {
+                    toggleCompletion(index);
+                };
+    
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.onclick = function () {
+                    deleteTask(index);
+                };
+    
+                li.appendChild(checkbox);
+                li.appendChild(taskText);
+                li.appendChild(deleteButton);
+    
+                taskList.appendChild(li);
+            });
+        }
+    </script>
+    
+</body>
+</html>
